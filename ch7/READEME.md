@@ -15,3 +15,4 @@
 
 - superでモジュールの一階層上を見る
 - test等で自分のモジュールをみたいときは use super::hogeが優秀
+- https://keens.github.io/blog/2018/12/08/rustnomoju_runotsukaikata_2018_editionhan/
