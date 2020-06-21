@@ -35,4 +35,32 @@ fn main() {
         }
     }
     println!("mode: {}", mode);
+    let s1 = "first";
+    let s2 = "apple";
+    let s3 = "father";
+    translate_english_word(s1);
+    translate_english_word(s2);
+    translate_english_word(s3);
+}
+
+fn translate_english_word(word: &str) -> String {
+    println!("original: {}", word);
+    let vowels = "aiueo";
+    let first = word.chars().nth(0).unwrap();
+    let is_init_vowel = match vowels.find(first){
+        Some(_) => true,
+        None => false
+    };
+    let mut result = String::from("");
+    if is_init_vowel {
+        result.push_str(word);
+        result.push_str("ay");
+    }else{
+        result.push_str(word);
+        let first = result.remove(0);
+        result.push(first);
+        result.push_str("ay");
+    }
+    println!("result: {}", result);
+    result
 }
