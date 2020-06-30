@@ -8,23 +8,23 @@ use std::collections::HashMap;
 //     intensity
 // }
 
-struct Cacher<T>
-    where T: Fn(u32) -> u32
+struct Cacher<T, U>
+    where T: Fn(U) -> U
 {
     calculation: T,
-    value_map: HashMap<u32, u32>
+    value_map: HashMap<U, U>
 }
 
-impl<T> Cacher<T>
-    where T:Fn(u32) -> u32
+impl<T, U> Cacher<T, U>
+    where T:Fn(U) -> U, U:Eq + std::hash::Hash + Copy
 {
-    fn new(calculation: T) -> Cacher<T>{
+    fn new(calculation: T) -> Cacher<T, U>{
         Cacher{
             calculation,
             value_map: HashMap::new(),
         }
     }
-    fn value(&mut self, arg: u32) -> &u32{
+    fn value(&mut self, arg: U) -> &U{
         if self.value_map.contains_key(&arg) {
             return &self.value_map[&arg]
         }
@@ -32,7 +32,7 @@ impl<T> Cacher<T>
         self.value_map.get(&arg).unwrap()
     }
 
-    fn value_second(&mut self, arg: u32) -> u32{
+    fn value_second(&mut self, arg: U) -> U{
         let result =  self.value_map.get(&arg);
         match result {
             Some(v) => {
@@ -87,6 +87,18 @@ fn generate_workout(intensity: u32, random_number: u32){
             println!("Today, run for {} minutes!", expensive_result.value(intensity));
         }
     }
+    let mut expensive_result = Cacher::new(|quote: &str| {
+        println!("calculating slowly ...");
+        thread::sleep(Duration::from_secs(2));
+        quote
+    });
+    println!("1 {}", expensive_result.value("hoge"));
+    println!("2 {}", expensive_result.value("hoge"));
+    println!("3 {}", expensive_result.value("hoge"));
+    println!("4 {}", expensive_result.value("fuga"));
+    println!("5 {}", expensive_result.value("fuga"));
+    println!("6 {}", expensive_result.value("hoge"));
+    println!("7 {}", expensive_result.value("fuga"));
 }
 
 fn main() {
@@ -95,7 +107,8 @@ fn main() {
     generate_workout(
         simulated_user_specified_value,
         simulated_random_number
-    )
+    );
+    
 }
 
 
@@ -120,3 +133,20 @@ fn main() {
 //         }
 //     }
 // }
+
+#[cfg(test)]
+mod test {
+    #[test]
+    fn iterator_demonstration(){
+        let v1 = vec![1, 2, 3];
+        let mut v1_iter = v1.iter();
+        assert_eq!(v1_iter.next(), Some(&1));
+        assert_eq!(v1_iter.next(), Some(&2));
+        assert_eq!(v1_iter.next(), Some(&3));
+        assert_eq!(v1_iter.next(), None);
+
+        let v1: Vec<i32> = vec![1, 2, 3];
+        let v2: Vec<_> = v1.iter().map(|x| x+1).collect();
+        assert_eq!(v2, vec![2, 3, 4]);
+    }
+}
